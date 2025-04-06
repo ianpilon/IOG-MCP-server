@@ -1,0 +1,16 @@
+{
+  "mcpServers": [
+    {
+      "iog-mcp": {
+        "command": "npm",
+        "args": [
+          "start"
+        ],
+        "baseContextProtocol/server-iog-mcp": "http://localhost:3002",
+        "env": {
+          "PORT": "3002"
+        }
+      }
+    }
+  ]
+}

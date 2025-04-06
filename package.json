@@ -1,0 +1,24 @@
+{
+  "name": "iog-mcp-server",
+  "version": "1.0.0",
+  "description": "IOG Model Context Protocol (MCP) Server Implementation",
+  "main": "iog_mcp_server.js",
+  "scripts": {
+    "start": "node iog_mcp_server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "MCP",
+    "IOG",
+    "Model Context Protocol",
+    "Windsurf"
+  ],
+  "author": "IOG",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}
