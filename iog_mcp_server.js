@@ -3,6 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs').promises;
 const path = require('path');
+const cryptoPricing = require('./crypto_pricing');
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -109,6 +110,39 @@ const tools = {
     } catch (error) {
       return { success: false, error: error.message };
     }
+  },
+  
+  // Cryptocurrency pricing and staking calculator tool
+  cryptoPrice: async (params) => {
+    try {
+      const { action, coinId, currencies, amount, years, apy } = params;
+      
+      switch (action) {
+        case 'getPrice':
+          const priceData = await cryptoPricing.getCoinPrice(coinId, currencies);
+          return { success: true, priceData };
+          
+        case 'search':
+          const searchResults = await cryptoPricing.searchCoins(params.query);
+          return { success: true, coins: searchResults };
+          
+        case 'calculateStaking':
+          const stakingResults = await cryptoPricing.calculateStakingReturns(
+            parseFloat(amount),
+            parseFloat(years),
+            parseFloat(apy),
+            coinId,
+            params.currency || 'usd'
+          );
+          return { success: true, stakingResults };
+          
+        default:
+          return { success: false, error: `Unknown action: ${action}` };
+      }
+    } catch (error) {
+      console.error('Crypto pricing error:', error);
+      return { success: false, error: error.message };
+    }
   }
 };
 
@@ -192,6 +226,49 @@ app.get('/mcp/tools', (req, res) => {
             description: 'Whether to retrieve detailed information about the product'
           }
         }
+      }
+    },
+    cryptoPrice: {
+      name: 'cryptoPrice',
+      description: 'Cryptocurrency pricing and staking calculator',
+      parameters: {
+        type: 'object',
+        properties: {
+          action: {
+            type: 'string',
+            description: 'Action to perform: getPrice, search, or calculateStaking',
+            enum: ['getPrice', 'search', 'calculateStaking']
+          },
+          coinId: {
+            type: 'string',
+            description: 'CoinGecko ID of the cryptocurrency (e.g., "cardano" for ADA)'
+          },
+          currencies: {
+            type: 'array',
+            description: 'Currency codes for price conversion (e.g., ["usd", "eur"])'
+          },
+          query: {
+            type: 'string',
+            description: 'Search query for finding cryptocurrencies (only for search action)'
+          },
+          amount: {
+            type: 'number',
+            description: 'Amount of cryptocurrency for staking calculations'
+          },
+          years: {
+            type: 'number',
+            description: 'Duration in years for staking calculations'
+          },
+          apy: {
+            type: 'number',
+            description: 'Annual percentage yield for staking (e.g., 5 for 5%)'
+          },
+          currency: {
+            type: 'string',
+            description: 'Currency for price display in staking calculations (default: "usd")'
+          }
+        },
+        required: ['action']
       }
     }
   };
